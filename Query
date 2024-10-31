@@ -1,0 +1,62 @@
+IF EXISTS(
+	SELECT * FROM CarShop_OLAP_Latihan..FilterTimeStamp
+	WHERE TableName = 'SalesFact'
+)
+BEGIN
+SELECT TimeCode, CustomerCode, StaffCode, CarCode,
+	TotalProfit = SUM(Quantity * CarPrice),
+	TotalCarSold = SUM (Quantity)
+FROM CarShop_OLAP_Latihan..TimeDimension td
+JOIN EN_Showroom_OLTP..TrSalesHeader tsh
+ON td.Date = tsh.SalesDate
+JOIN CarShop_OLAP_Latihan..CustomerDimension c
+ON tsh.CustomerID = c.CustomerID
+JOIN CarShop_OLAP_Latihan..StaffDimension s
+ON tsh.StaffID = s.StaffID
+JOIN EN_Showroom_OLTP..TrSalesDetail tsd
+ON tsh.SalesID = tsd.SalesID
+JOIN CarShop_OLAP_Latihan..CarDimension cr
+ON tsd.CarID = cr.CarID
+WHERE tsh.SalesDate > (
+		SELECT LastETL
+		FROM CarShop_OLAP_Latihan..FilterTimeStamp
+		WHERE TableName = 'SalesFact'
+	)
+GROUP BY TimeCode, CustomerCode, StaffCode, CarCode
+END
+ELSE
+BEGIN
+SELECT TimeCode, CustomerCode, StaffCode, CarCode,
+	TotalProfit = SUM(Quantity * CarPrice),
+	TotalCarSold = SUM (Quantity)
+FROM CarShop_OLAP_Latihan..TimeDimension td
+JOIN EN_Showroom_OLTP..TrSalesHeader tsh
+ON td.Date = tsh.SalesDate
+JOIN CarShop_OLAP_Latihan..CustomerDimension c
+ON tsh.CustomerID = c.CustomerID
+JOIN CarShop_OLAP_Latihan..StaffDimension s
+ON tsh.StaffID = s.StaffID
+JOIN EN_Showroom_OLTP..TrSalesDetail tsd
+ON tsh.SalesID = tsd.SalesID
+JOIN CarShop_OLAP_Latihan..CarDimension cr
+ON tsd.CarID = cr.CarID
+GROUP BY TimeCode, CustomerCode, StaffCode, CarCode
+END
+
+IF EXISTS(
+	SELECT * FROM CarShop_OLAP_Latihan..FilterTimeStamp
+	WHERE TableName = 'SalesFact'
+)
+BEGIN
+	UPDATE CarShop_OLAP_Latihan..FilterTimeStamp
+	SET LastETL = GETDATE()
+	WHERE TableName = 'SalesFact'
+END
+ELSE
+BEGIN
+	INSERT INTO CarShop_OLAP_Latihan..FilterTimeStamp 
+	VALUES ('SalestFact', GETDATE())
+END
+
+SELECT * FROM CarShop_OLAP_Latihan..SalesFact
+DROP TABLE CarShop_OLAP_Latihan..SalesFact
