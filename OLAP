@@ -1,6 +1,15 @@
-CREATE DATABASE CarShop_OLAP
+CREATE DATABASE CarShop_OLAP_Latihan
 GO
-USE CarShop_OLAP
+USE CarShop_OLAP_Latihan
+
+CREATE TABLE TimeDimension (
+	TimeCode INT PRIMARY KEY IDENTITY,
+	[Date] DATE,
+	[Day] INT,
+	[Month] INT,
+	[Quarter] INT,
+	[Year] INT
+)
 
 CREATE TABLE StaffDimension(
 	StaffCode INT PRIMARY KEY IDENTITY,
@@ -26,16 +35,16 @@ CREATE TABLE CustomerDimension(
 	CustomerID CHAR(7),
 	CustomerName VARCHAR(50),
 	CustomerGender CHAR(1),
-	CustomerEmail VARCHAR(50)
+	CustomerEmail VARCHAR(50),
 )
 
-CREATE TABLE TimeDimension(
-	TimeCode INT PRIMARY KEY IDENTITY,
-	[Date] DATE,
-	[Day] INT,
-	[Month] INT,
-	[Quarter] INT,
-	[Year] INT
+CREATE TABLE SalesFact(
+	CustomerCode INT,
+	TimeCode INT,
+	StaffCode INT,
+	CarCode INT,
+	[Total Profit] BIGINT,
+	[Total Car Sold] INT
 )
 
 CREATE TABLE FilterTimeStamp(
@@ -48,6 +57,6 @@ CREATE TABLE SalesFact(
 	StaffCode INT,
 	CarCode INT,
 	TimeCode INT,
-	[Total Profit] BIGINT,
-	[Total Car Sold] INT
+	TotalProfit BIGINT,
+	TotalCarSold INT
 )
