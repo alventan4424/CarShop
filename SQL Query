@@ -1,3 +1,45 @@
+SELECT StaffID, StaffName, StaffSalary, StaffGender
+FROM MsStaff
+
+SELECT CarID, CarName, CarPrice
+FROM MsCar
+
+SELECT CustomerID, CustomerName, CustomerGender, CustomerEmail
+FROM MsCustomer
+
+
+IF EXISTS (SELECT * 
+			FROM [CarShop_OLAP_Latihan]..FilterTimeStamp
+			WHERE TableName = 'TimeDimension'
+			)
+BEGIN
+	SELECT
+	[Date] = x.Date,
+	[Day] = DAY(x.Date),
+	[Month] = MONTH (x.Date),
+	[Quarter] = DATEPART(QUARTER, x.Date),
+	[Year] = YEAR(x.Date)
+	FROM (
+		SELECT [Date] = SalesDate
+		FROM [EN_Showroom_OLTP]..TrSalesHeader
+	)as X, [CarShop_OLAP_Latihan]..FilterTimeStamp
+	WHERE x.Date > LastETL AND TableName = 'TimeDimension'
+
+END
+ELSE
+BEGIN
+	SELECT
+	[Date] = x.Date,
+	[Day] = DAY(x.Date),
+	[Month] = MONTH (x.Date),
+	[Quarter] = DATEPART(QUARTER, x.Date),
+	[Year] = YEAR(x.Date)
+	FROM (
+		SELECT [Date] = SalesDate
+		FROM [EN_Showroom_OLTP]..TrSalesHeader
+	)as X
+END
+
 IF EXISTS(
 	SELECT * FROM CarShop_OLAP_Latihan..FilterTimeStamp
 	WHERE TableName = 'SalesFact'
@@ -58,5 +100,8 @@ BEGIN
 	VALUES ('SalestFact', GETDATE())
 END
 
-SELECT * FROM CarShop_OLAP_Latihan..SalesFact
-DROP TABLE CarShop_OLAP_Latihan..SalesFact
+SELECT * FROM [CarShop_OLAP_Latihan]..StaffDimension
+SELECT * FROM [CarShop_OLAP_Latihan]..TimeDimension
+SELECT * FROM [CarShop_OLAP_Latihan]..CustomerDimension
+SELECT * FROM [CarShop_OLAP_Latihan]..CarDimension
+SELECT * FROM [CarShop_OLAP_Latihan]..SalesFact
