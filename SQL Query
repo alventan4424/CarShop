@@ -8,10 +8,11 @@ SELECT CustomerID, CustomerName, CustomerGender, CustomerEmail
 FROM MsCustomer
 
 
-IF EXISTS (SELECT * 
-			FROM [CarShop_OLAP_Latihan]..FilterTimeStamp
-			WHERE TableName = 'TimeDimension'
-			)
+IF EXISTS (
+	SELECT * 
+	FROM [CarShop_OLAP_Latihan]..FilterTimeStamp
+	WHERE TableName = 'TimeDimension'
+	)
 BEGIN
 	SELECT
 	[Date] = x.Date,
@@ -24,7 +25,6 @@ BEGIN
 		FROM [EN_Showroom_OLTP]..TrSalesHeader
 	)as X, [CarShop_OLAP_Latihan]..FilterTimeStamp
 	WHERE x.Date > LastETL AND TableName = 'TimeDimension'
-
 END
 ELSE
 BEGIN
@@ -41,7 +41,8 @@ BEGIN
 END
 
 IF EXISTS(
-	SELECT * FROM CarShop_OLAP_Latihan..FilterTimeStamp
+	SELECT * 
+	FROM CarShop_OLAP_Latihan..FilterTimeStamp
 	WHERE TableName = 'SalesFact'
 )
 BEGIN
